@@ -31,9 +31,15 @@ app.get("/", (req, res) => {
 
 /*************GET ALL MOVIES***************/
 app.get("/all-movies", (req, res) => {
+  let rating = req.query.rating;
+
+  let filteredList = favoriteMovieList.filter((rate) => {
+    return rate.starRating <= rating;
+  });
+
   res.json({
     success: true,
-    favoriteMovieList: favoriteMovieList,
+    favoriteMovieList: filteredList,
   });
 });
 
@@ -54,6 +60,32 @@ app.get("/single-movie/:titleToFind", (req, res) => {
 /*************POST NEW MOVIE**************/
 app.post("/new-movie", (req, res) => {
   let newMovie = {};
+
+  if (req.body.title === undefined || typeof req.body.title !== "string")
+    return res.json({
+      sucess: false,
+      message: "movie title is required and must be a string",
+    });
+
+  if (
+    req.body.starRating === undefined ||
+    typeof req.body.starRating !== "number" ||
+    req.body.starRating > 5
+  )
+    return res.json({
+      sucess: false,
+      message: "starRating is required and must be a number",
+    });
+
+  if (
+    req.body.isRecommended === undefined ||
+    typeof req.body.isRecommended !== "boolean"
+  )
+    return res.json({
+      sucess: false,
+      message:
+        "movie recomendation is required and must be a boolean (true / false)",
+    });
 
   newMovie.title = req.body.title;
   newMovie.starRating = req.body.starRating;
@@ -108,8 +140,18 @@ app.put("/update-movie/:movieToUpdate", (req, res) => {
 });
 
 /*************DELETE A MOVIE**************/
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+app.delete("/delete-movie/:movieToDelete", (req, res) => {
+  let titleToDelete = req.params.movieToDelete;
+
+  let deleteMovieIndex = favoriteMovieList.findIndex((movie) => {
+    return movie.title === titleToDelete;
+  });
+
+  favoriteMovieList.splice(deleteMovieIndex, 1);
+
+  res.json({
+    success: true,
+  });
 });
 
 app.listen(port, () => {
