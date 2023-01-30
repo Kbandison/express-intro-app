@@ -31,7 +31,15 @@ app.get("/", (req, res) => {
 
 /*************GET ALL MOVIES***************/
 app.get("/all-movies", (req, res) => {
-  let rating = req.query.rating;
+  res.json({
+    success: true,
+    favoriteMovieList: favoriteMovieList,
+  });
+});
+
+/*************GET ALL MOVIES BELOW RATING***************/
+app.get("/all-movies/:ratingNum", (req, res) => {
+  let rating = req.params.ratingNum;
 
   let filteredList = favoriteMovieList.filter((rate) => {
     return rate.starRating <= rating;
